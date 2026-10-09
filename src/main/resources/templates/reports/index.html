@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Reports')}">
+    <meta charset="UTF-8">
+    <title>Reports | Electrical Inventory</title>
+</head>
+<body>
+<nav th:replace="~{fragments/navbar :: navbar('reports')}"></nav>
+
+<main class="container py-4">
+    <div th:replace="~{fragments/alerts :: alerts}"></div>
+
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">Reports</h1>
+            <p class="page-subtitle">
+                Six reports built from the same queries the screens use. Each report is
+                print-friendly and most can be exported as CSV.
+            </p>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-12 col-md-6 col-lg-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h2 class="h6">Current Inventory Report</h2>
+                    <p class="small text-muted">
+                        Every product-plant row with quantity, unit, reorder level and status.
+                    </p>
+                    <div class="d-flex gap-2">
+                        <a class="btn btn-sm btn-primary" th:href="@{/reports/inventory}">View</a>
+                        <a class="btn btn-sm btn-outline-secondary"
+                           th:href="@{/reports/export/inventory.csv}">CSV</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-md-6 col-lg-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h2 class="h6">Plant-wise Inventory Report</h2>
+                    <p class="small text-muted">
+                        Total quantity, product count and low stock count per plant.
+                    </p>
+                    <a class="btn btn-sm btn-primary" th:href="@{/reports/plant-wise}">View</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-md-6 col-lg-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h2 class="h6">Stock IN Report</h2>
+                    <p class="small text-muted">
+                        All receipts in a date range, with reference number and performer.
+                    </p>
+                    <div class="d-flex gap-2">
+                        <a class="btn btn-sm btn-primary" th:href="@{/reports/stock-in}">View</a>
+                        <a class="btn btn-sm btn-outline-secondary"
+                           th:href="@{/reports/export/transactions.csv(type='IN')}">CSV</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-md-6 col-lg-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h2 class="h6">Stock OUT Report</h2>
+                    <p class="small text-muted">
+                        All issues in a date range, with reference number and performer.
+                    </p>
+                    <div class="d-flex gap-2">
+                        <a class="btn btn-sm btn-primary" th:href="@{/reports/stock-out}">View</a>
+                        <a class="btn btn-sm btn-outline-secondary"
+                           th:href="@{/reports/export/transactions.csv(type='OUT')}">CSV</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-md-6 col-lg-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h2 class="h6">Low Stock Report</h2>
+                    <p class="small text-muted">
+                        Quantity, reorder level and shortfall for every row needing attention.
+                    </p>
+                    <div class="d-flex gap-2">
+                        <a class="btn btn-sm btn-primary" th:href="@{/reports/low-stock}">View</a>
+                        <a class="btn btn-sm btn-outline-secondary"
+                           th:href="@{/reports/export/low-stock.csv}">CSV</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-md-6 col-lg-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h2 class="h6">Transaction History Report</h2>
+                    <p class="small text-muted">
+                        Complete IN and OUT history in a date range.
+                    </p>
+                    <div class="d-flex gap-2">
+                        <a class="btn btn-sm btn-primary" th:href="@{/reports/transactions}">View</a>
+                        <a class="btn btn-sm btn-outline-secondary"
+                           th:href="@{/reports/export/transactions.csv}">CSV</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer th:replace="~{fragments/tail :: tail}"></footer>
+<th:block th:replace="~{fragments/tail :: scripts}"></th:block>
+</body>
+</html>

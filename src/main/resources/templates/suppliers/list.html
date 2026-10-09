@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/head :: head('Suppliers')}">
+    <meta charset="UTF-8">
+    <title>Suppliers | Electrical Inventory</title>
+</head>
+<body>
+<nav th:replace="~{fragments/navbar :: navbar('suppliers')}"></nav>
+
+<main class="container-fluid py-4 px-lg-4">
+    <div th:replace="~{fragments/alerts :: alerts}"></div>
+
+    <div class="page-header no-print">
+        <div>
+            <h1 class="page-title">Suppliers</h1>
+            <p class="page-subtitle">Supplier master. Supplier code must be unique.</p>
+        </div>
+        <a class="btn btn-primary" sec:authorize="hasAnyRole('ADMIN','INVENTORY_MANAGER')"
+           th:href="@{/suppliers/new}">Add Supplier</a>
+    </div>
+
+    <div class="card">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                <tr>
+                    <th>Supplier Code</th>
+                    <th>Name</th>
+                    <th>Contact Person</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Status</th>
+                    <th class="text-end no-print">Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="supplier : ${suppliers}">
+                    <td class="fw-semibold" th:text="${supplier.supplierCode}">CODE</td>
+                    <td>
+                        <a th:href="@{/suppliers/{id}(id=${supplier.id})}" class="text-decoration-none"
+                           th:text="${supplier.name}">Name</a>
+                    </td>
+                    <td th:text="${supplier.contactPerson} ?: '-'">-</td>
+                    <td th:text="${supplier.email} ?: '-'">-</td>
+                    <td th:text="${supplier.phone} ?: '-'">-</td>
+                    <td th:replace="~{fragments/alerts :: activeBadge(${supplier.active})}"></td>
+                    <td class="text-end no-print">
+                        <div class="btn-group btn-group-sm">
+                            <a class="btn btn-outline-secondary"
+                               th:href="@{/suppliers/{id}(id=${supplier.id})}">View</a>
+                            <a class="btn btn-outline-primary"
+                               sec:authorize="hasAnyRole('ADMIN','INVENTORY_MANAGER')"
+                               th:href="@{/suppliers/{id}/edit(id=${supplier.id})}">Edit</a>
+                            <form th:action="@{/suppliers/{id}/status(id=${supplier.id})}"
+                                  method="post" class="d-inline">
+                                <input type="hidden" name="active" th:value="${!supplier.active}">
+                                <button type="submit" class="btn btn-outline-warning"
+                                        th:data-confirm="${supplier.active}
+                                            ? 'Deactivate this supplier?' : 'Activate this supplier?'"
+                                        th:text="${supplier.active} ? 'Deactivate' : 'Activate'">
+                                    Toggle
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(suppliers)}">
+                    <td colspan="7" class="empty-state">No suppliers found.</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
+
+<footer th:replace="~{fragments/tail :: tail}"></footer>
+<th:block th:replace="~{fragments/tail :: scripts}"></th:block>
+</body>
+</html>

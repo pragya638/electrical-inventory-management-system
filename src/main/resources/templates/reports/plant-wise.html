@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head(${reportTitle})}">
+    <meta charset="UTF-8">
+    <title>Report | Electrical Inventory</title>
+</head>
+<body>
+<nav th:replace="~{fragments/navbar :: navbar('reports')}"></nav>
+
+<main class="container-fluid py-4 px-lg-4">
+    <div th:replace="~{fragments/alerts :: alerts}"></div>
+
+    <div class="page-header no-print">
+        <div>
+            <h1 class="page-title" th:text="${reportTitle}">Report</h1>
+            <p class="page-subtitle">Prototype data. Print-friendly layout.</p>
+        </div>
+        <div class="d-flex gap-2">
+            <button type="button" class="btn btn-outline-primary" onclick="window.print()">
+                Print
+            </button>
+            <a class="btn btn-outline-secondary" th:href="@{/reports}">All reports</a>
+        </div>
+    </div>
+
+    <div class="print-header">
+        <h2 th:text="${reportTitle}">Report</h2>
+    </div>
+
+    <div class="card">
+        <div class="table-responsive">
+            <table class="table table-sm table-hover mb-0">
+                <thead>
+                <tr>
+                    <th>Plant</th>
+                    <th>Location</th>
+                    <th class="text-end">Product Count</th>
+                    <th class="text-end">Total Quantity</th>
+                    <th class="text-end">Low Stock Items</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="row : ${rows}">
+                    <td class="fw-semibold" th:text="${row.plantName}">Plant</td>
+                    <td class="text-muted" th:text="${row.location} ?: '-'">-</td>
+                    <td class="text-end" th:text="${row.productCount}">0</td>
+                    <td class="text-end" th:text="${row.totalQuantity}">0</td>
+                    <td class="text-end">
+                        <span class="badge"
+                              th:classappend="${row.lowStockCount > 0} ? 'text-bg-danger' : 'text-bg-success'"
+                              th:text="${row.lowStockCount}">0</span>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(rows)}">
+                    <td colspan="5" class="empty-state">No plants to report.</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
+
+<footer th:replace="~{fragments/tail :: tail}"></footer>
+<th:block th:replace="~{fragments/tail :: scripts}"></th:block>
+</body>
+</html>

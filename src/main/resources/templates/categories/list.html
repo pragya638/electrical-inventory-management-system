@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/head :: head('Categories')}">
+    <meta charset="UTF-8">
+    <title>Categories | Electrical Inventory</title>
+</head>
+<body>
+<nav th:replace="~{fragments/navbar :: navbar('categories')}"></nav>
+
+<main class="container-fluid py-4 px-lg-4">
+    <div th:replace="~{fragments/alerts :: alerts}"></div>
+
+    <div class="page-header no-print">
+        <div>
+            <h1 class="page-title">Categories</h1>
+            <p class="page-subtitle">Category master. Category name must be unique.</p>
+        </div>
+        <a class="btn btn-primary" sec:authorize="hasAnyRole('ADMIN','INVENTORY_MANAGER')"
+           th:href="@{/categories/new}">Add Category</a>
+    </div>
+
+    <form class="filter-bar mb-3 no-print" method="get" th:action="@{/categories}">
+        <div class="row g-2 align-items-end">
+            <div class="col-12 col-md-8">
+                <label class="form-label" for="search">Search</label>
+                <input type="text" id="search" name="search" class="form-control"
+                       th:value="${search}" placeholder="Category name or description">
+            </div>
+            <div class="col-12 col-md-4 d-flex gap-2">
+                <button type="submit" class="btn btn-primary">Search</button>
+                <a class="btn btn-outline-secondary" th:href="@{/categories}">Reset</a>
+            </div>
+        </div>
+    </form>
+
+    <div class="card">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                <tr>
+                    <th style="width: 60px">ID</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Status</th>
+                    <th class="text-end no-print">Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="category : ${categories}">
+                    <td class="text-muted" th:text="${category.id}">0</td>
+                    <td class="fw-semibold" th:text="${category.name}">Name</td>
+                    <td class="text-muted" th:text="${category.description} ?: '-'">-</td>
+                    <td th:replace="~{fragments/alerts :: activeBadge(${category.active})}"></td>
+                    <td class="text-end no-print">
+                        <div class="btn-group btn-group-sm">
+                            <a class="btn btn-outline-primary"
+                               sec:authorize="hasAnyRole('ADMIN','INVENTORY_MANAGER')"
+                               th:href="@{/categories/{id}/edit(id=${category.id})}">Edit</a>
+                            <form th:action="@{/categories/{id}/status(id=${category.id})}"
+                                  method="post" class="d-inline">
+                                <input type="hidden" name="active" th:value="${!category.active}">
+                                <button type="submit" class="btn btn-outline-warning"
+                                        th:data-confirm="${category.active}
+                                            ? 'Deactivate this category?' : 'Activate this category?'"
+                                        th:text="${category.active} ? 'Deactivate' : 'Activate'">
+                                    Toggle
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(categories)}">
+                    <td colspan="5" class="empty-state">No categories found.</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
+
+<footer th:replace="~{fragments/tail :: tail}"></footer>
+<th:block th:replace="~{fragments/tail :: scripts}"></th:block>
+</body>
+</html>

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Error')}">
+    <meta charset="UTF-8">
+    <title>Error | Electrical Inventory</title>
+</head>
+<body>
+<nav th:replace="~{fragments/navbar :: navbar('')}"></nav>
+
+<main class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-8 col-lg-6">
+            <div class="card">
+                <div class="card-body text-center py-5">
+                    <h1 class="display-6 text-primary" th:text="${status} ?: 'Error'">Error</h1>
+                    <p class="text-muted" th:text="${error} ?: 'Something went wrong.'">
+                        Something went wrong.
+                    </p>
+                    <p class="small text-muted">
+                        The full technical detail was written to the server log rather than shown
+                        here.
+                    </p>
+                    <a class="btn btn-primary" th:href="@{/dashboard}">Back to dashboard</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer th:replace="~{fragments/tail :: tail}"></footer>
+<th:block th:replace="~{fragments/tail :: scripts}"></th:block>
+</body>
+</html>

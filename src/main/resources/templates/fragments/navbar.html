@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<body>
+
+<!-- Top navigation. Links the signed-in role may not use are not rendered at all,
+     and the matching route is blocked again in SecurityConfig. -->
+<nav class="navbar navbar-expand-lg navbar-dark navbar-wonder no-print"
+     th:fragment="navbar(active)">
+    <div class="container-fluid">
+        <a class="navbar-brand" th:href="@{/dashboard}">
+            <span class="brand-mark">WE</span> Electrical Inventory
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                data-bs-target="#mainNav" aria-controls="mainNav"
+                aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="mainNav">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/dashboard}"
+                       th:classappend="${active == 'dashboard'} ? 'active'">Dashboard</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/products}"
+                       th:classappend="${active == 'products'} ? 'active'">Products</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/categories}"
+                       th:classappend="${active == 'categories'} ? 'active'">Categories</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/plants}"
+                       th:classappend="${active == 'plants'} ? 'active'">Plants</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/suppliers}"
+                       th:classappend="${active == 'suppliers'} ? 'active'">Suppliers</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/inventory}"
+                       th:classappend="${active == 'inventory'} ? 'active'">Inventory</a>
+                </li>
+                <li class="nav-item" sec:authorize="hasAnyRole('ADMIN','INVENTORY_MANAGER')">
+                    <a class="nav-link" th:href="@{/stock/in}"
+                       th:classappend="${active == 'stock-in'} ? 'active'">Stock IN</a>
+                </li>
+                <li class="nav-item" sec:authorize="hasAnyRole('ADMIN','INVENTORY_MANAGER')">
+                    <a class="nav-link" th:href="@{/stock/out}"
+                       th:classappend="${active == 'stock-out'} ? 'active'">Stock OUT</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/transactions}"
+                       th:classappend="${active == 'transactions'} ? 'active'">Transactions</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/low-stock}"
+                       th:classappend="${active == 'low-stock'} ? 'active'">Low Stock</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/reports}"
+                       th:classappend="${active == 'reports'} ? 'active'">Reports</a>
+                </li>
+                <li class="nav-item" sec:authorize="hasRole('ADMIN')">
+                    <a class="nav-link" th:href="@{/users}"
+                       th:classappend="${active == 'users'} ? 'active'">Users</a>
+                </li>
+            </ul>
+
+            <div class="d-flex align-items-center gap-3 text-white">
+                <span class="small">
+                    <span sec:authentication="name">signed in</span>
+                    <span class="badge text-bg-warning ms-1"
+                          sec:authentication="authorities">role</span>
+                </span>
+                <form th:action="@{/logout}" method="post" class="m-0">
+                    <button type="submit" class="btn btn-sm btn-outline-light">Logout</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</nav>
+
+</body>
+</html>

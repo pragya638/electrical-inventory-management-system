@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/head :: head('Products')}">
+    <meta charset="UTF-8">
+    <title>Products | Electrical Inventory</title>
+</head>
+<body>
+<nav th:replace="~{fragments/navbar :: navbar('products')}"></nav>
+
+<main class="container-fluid py-4 px-lg-4">
+    <div th:replace="~{fragments/alerts :: alerts}"></div>
+
+    <div class="page-header no-print">
+        <div>
+            <h1 class="page-title">Products</h1>
+            <p class="page-subtitle">Product master. Product code must be unique.</p>
+        </div>
+        <a class="btn btn-primary" sec:authorize="hasAnyRole('ADMIN','INVENTORY_MANAGER')"
+           th:href="@{/products/new}">Add Product</a>
+    </div>
+
+    <!-- Search and filter -->
+    <form class="filter-bar mb-3 no-print" method="get" th:action="@{/products}">
+        <div class="row g-2 align-items-end">
+            <div class="col-12 col-md-5">
+                <label class="form-label" for="search">Search</label>
+                <input type="text" id="search" name="search" class="form-control"
+                       th:value="${filter.search}" placeholder="Code, name or category">
+            </div>
+            <div class="col-6 col-md-3">
+                <label class="form-label" for="categoryId">Category</label>
+                <select id="categoryId" name="categoryId" class="form-select">
+                    <option value="">All categories</option>
+                    <option th:each="category : ${categories}"
+                            th:value="${category.id}"
+                            th:text="${category.name}"
+                            th:selected="${filter.categoryId != null
+                                          and filter.categoryId == category.id}">Category</option>
+                </select>
+            </div>
+            <div class="col-6 col-md-2">
+                <label class="form-label" for="status">Status</label>
+                <select id="status" name="status" class="form-select">
+                    <option value="">All</option>
+                    <option value="active" th:selected="${filter.status == 'active'}">Active</option>
+                    <option value="inactive" th:selected="${filter.status == 'inactive'}">Inactive</option>
+                </select>
+            </div>
+            <div class="col-12 col-md-2 d-flex gap-2">
+                <button type="submit" class="btn btn-primary">Apply</button>
+                <a class="btn btn-outline-secondary" th:href="@{/products}">Reset</a>
+            </div>
+        </div>
+    </form>
+
+    <div class="card">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                <tr>
+                    <th>Product Code</th>
+                    <th>Product Name</th>
+                    <th>Category</th>
+                    <th>Unit</th>
+                    <th class="text-end">Reorder Level</th>
+                    <th>Status</th>
+                    <th class="text-end no-print">Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="product : ${products}">
+                    <td class="fw-semibold" th:text="${product.productCode}">CODE</td>
+                    <td>
+                        <a th:href="@{/products/{id}(id=${product.id})}"
+                           th:text="${product.name}" class="text-decoration-none">Name</a>
+                    </td>
+                    <td th:text="${product.categoryName}">Category</td>
+                    <td th:text="${product.unit}">Unit</td>
+                    <td class="text-end" th:text="${product.reorderLevel}">0</td>
+                    <td th:replace="~{fragments/alerts :: activeBadge(${product.active})}"></td>
+                    <td class="text-end no-print">
+                        <div class="btn-group btn-group-sm">
+                            <a class="btn btn-outline-secondary"
+                               th:href="@{/products/{id}(id=${product.id})}">View</a>
+                            <a class="btn btn-outline-primary"
+                               sec:authorize="hasAnyRole('ADMIN','INVENTORY_MANAGER')"
+                               th:href="@{/products/{id}/edit(id=${product.id})}">Edit</a>
+                            <form th:action="@{/products/{id}/status(id=${product.id})}"
+                                  method="post" class="d-inline">
+                                <input type="hidden" name="active"
+                                       th:value="${!product.active}">
+                                <button type="submit" class="btn btn-outline-warning"
+                                        th:data-confirm="${product.active}
+                                            ? 'Deactivate this product?' : 'Activate this product?'"
+                                        th:text="${product.active} ? 'Deactivate' : 'Activate'">
+                                    Toggle
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(products)}">
+                    <td colspan="7" class="empty-state">
+                        No products match the current filter.
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
+
+<footer th:replace="~{fragments/tail :: tail}"></footer>
+<th:block th:replace="~{fragments/tail :: scripts}"></th:block>
+</body>
+</html>

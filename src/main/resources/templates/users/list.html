@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Users')}">
+    <meta charset="UTF-8">
+    <title>Users | Electrical Inventory</title>
+</head>
+<body>
+<nav th:replace="~{fragments/navbar :: navbar('users')}"></nav>
+
+<main class="container-fluid py-4 px-lg-4">
+    <div th:replace="~{fragments/alerts :: alerts}"></div>
+
+    <div class="page-header no-print">
+        <div>
+            <h1 class="page-title">Users</h1>
+            <p class="page-subtitle">
+                User management is restricted to the ADMIN role. Passwords are stored as BCrypt
+                hashes.
+            </p>
+        </div>
+        <a class="btn btn-primary" th:href="@{/users/new}">Add User</a>
+    </div>
+
+    <div class="card">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                <tr>
+                    <th style="width: 60px">ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Status</th>
+                    <th>Created</th>
+                    <th class="text-end no-print">Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="user : ${users}">
+                    <td class="text-muted" th:text="${user.id}">0</td>
+                    <td class="fw-semibold" th:text="${user.name}">Name</td>
+                    <td th:text="${user.email}">email</td>
+                    <td>
+                        <span class="badge"
+                              th:classappend="${user.role.name() == 'ADMIN'} ? 'text-bg-dark'
+                              : (${user.role.name() == 'INVENTORY_MANAGER'} ? 'text-bg-primary' : 'text-bg-secondary')"
+                              th:text="${user.role}">ROLE</span>
+                    </td>
+                    <td th:replace="~{fragments/alerts :: activeBadge(${user.active})}"></td>
+                    <td class="text-muted small" th:text="${user.createdAt}">-</td>
+                    <td class="text-end no-print">
+                        <div class="btn-group btn-group-sm">
+                            <a class="btn btn-outline-primary"
+                               th:href="@{/users/{id}/edit(id=${user.id})}">Edit</a>
+                            <form th:action="@{/users/{id}/status(id=${user.id})}"
+                                  method="post" class="d-inline">
+                                <input type="hidden" name="active" th:value="${!user.active}">
+                                <button type="submit" class="btn btn-outline-warning"
+                                        th:data-confirm="${user.active}
+                                            ? 'Deactivate this user? They will not be able to sign in.'
+                                            : 'Activate this user?'"
+                                        th:text="${user.active} ? 'Deactivate' : 'Activate'">
+                                    Toggle
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(users)}">
+                    <td colspan="7" class="empty-state">No users found.</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
+
+<footer th:replace="~{fragments/tail :: tail}"></footer>
+<th:block th:replace="~{fragments/tail :: scripts}"></th:block>
+</body>
+</html>

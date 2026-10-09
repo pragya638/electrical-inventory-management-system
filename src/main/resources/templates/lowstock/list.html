@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Low Stock')}">
+    <meta charset="UTF-8">
+    <title>Low Stock | Electrical Inventory</title>
+</head>
+<body>
+<nav th:replace="~{fragments/navbar :: navbar('low-stock')}"></nav>
+
+<main class="container-fluid py-4 px-lg-4">
+    <div th:replace="~{fragments/alerts :: alerts}"></div>
+
+    <div class="page-header no-print">
+        <div>
+            <h1 class="page-title">Low Stock</h1>
+            <p class="page-subtitle">
+                Rows where the current quantity is at or below the product's reorder level.
+            </p>
+        </div>
+        <div class="d-flex gap-2">
+            <a class="btn btn-outline-secondary no-print"
+               th:href="@{/reports/export/low-stock.csv}">Export CSV</a>
+            <a class="btn btn-success" th:href="@{/stock/in}">Record Stock IN</a>
+        </div>
+    </div>
+
+    <div class="alert alert-warning" role="alert">
+        <strong th:text="${#lists.size(rows)}">0</strong>
+        item(s) need attention. Replenish them by recording a Stock IN movement.
+    </div>
+
+    <div class="card">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Plant</th>
+                    <th class="text-end">Current Quantity</th>
+                    <th class="text-end">Reorder Level</th>
+                    <th class="text-end">Shortfall</th>
+                    <th>Status</th>
+                    <th class="text-end no-print">Action</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="row : ${rows}"
+                    th:classappend="${row.status.name() == 'OUT_OF_STOCK'} ? 'table-danger'">
+                    <td>
+                        <span class="fw-semibold" th:text="${row.productCode}">CODE</span>
+                        <span class="text-muted small d-block" th:text="${row.productName}"></span>
+                    </td>
+                    <td th:text="${row.plantName}">Plant</td>
+                    <td class="text-end fw-bold" th:text="${row.quantity}">0</td>
+                    <td class="text-end" th:text="${row.reorderLevel}">0</td>
+                    <td class="text-end fw-semibold text-danger"
+                        th:text="${row.reorderLevel - row.quantity}">0</td>
+                    <td th:replace="~{fragments/alerts :: stockBadge(${row.status})}"></td>
+                    <td class="text-end no-print">
+                        <a class="btn btn-sm btn-success"
+                           th:href="@{/stock/in}">Stock IN</a>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(rows)}">
+                    <td colspan="7" class="empty-state">
+                        No items are at or below their reorder level.
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
+
+<footer th:replace="~{fragments/tail :: tail}"></footer>
+<th:block th:replace="~{fragments/tail :: scripts}"></th:block>
+</body>
+</html>

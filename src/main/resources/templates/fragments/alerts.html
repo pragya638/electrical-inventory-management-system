@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!-- Flash banners. errorMessage is set by GlobalExceptionHandler when a business
+     rule rejects a form submission; the success banners below are driven by the
+     ?created / ?updated / ?status / ?deleted query parameters the controllers
+     redirect with, so the message survives the redirect that follows a POST. -->
+<div th:fragment="alerts">
+    <div class="alert alert-danger alert-dismissible fade show" role="alert"
+         th:if="${errorMessage}">
+        <strong>Action failed:</strong> <span th:text="${errorMessage}">message</span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <div class="alert alert-success alert-dismissible fade show" role="alert"
+         th:if="${param.created}">
+        Record created successfully.
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    <div class="alert alert-success alert-dismissible fade show" role="alert"
+         th:if="${param.updated}">
+        Record updated successfully.
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    <div class="alert alert-success alert-dismissible fade show" role="alert"
+         th:if="${param.status}">
+        Status changed successfully.
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    <div class="alert alert-success alert-dismissible fade show" role="alert"
+         th:if="${param.deleted}">
+        Record deleted successfully.
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+</div>
+
+<!-- Shared empty-state row for list tables. -->
+<tr th:fragment="emptyRow(colspan)">
+    <td th:attr="colspan=${colspan}" class="empty-state">No records found.</td>
+</tr>
+
+<!-- Stock status badge. OUT_OF_STOCK is red, LOW_STOCK is amber, IN_STOCK is green. -->
+<span th:fragment="stockBadge(status)" class="badge"
+      th:classappend="${status.name() == 'OUT_OF_STOCK'} ? 'text-bg-danger'
+                    : (${status.name() == 'LOW_STOCK'} ? 'text-bg-warning' : 'text-bg-success')"
+      th:text="${status.name().replace('_', ' ')}">STATUS</span>
+
+<!-- Active / inactive badge used by every master-data list. -->
+<span th:fragment="activeBadge(active)" class="badge"
+      th:classappend="${active} ? 'text-bg-success' : 'text-bg-secondary'"
+      th:text="${active} ? 'ACTIVE' : 'INACTIVE'">STATUS</span>
+
+</body>
+</html>

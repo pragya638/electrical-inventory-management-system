@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/head :: head('Dashboard')}">
+    <meta charset="UTF-8">
+    <title>Dashboard | Electrical Inventory</title>
+</head>
+<body>
+<nav th:replace="~{fragments/navbar :: navbar('dashboard')}"></nav>
+
+<main class="container-fluid py-4 px-lg-4">
+    <div th:replace="~{fragments/alerts :: alerts}"></div>
+
+    <div class="page-header no-print">
+        <div>
+            <h1 class="page-title">Dashboard</h1>
+            <p class="page-subtitle">
+                Overview of stock across all plants. Prototype data only.
+            </p>
+        </div>
+        <div class="d-flex gap-2">
+            <a class="btn btn-outline-primary" th:href="@{/inventory}">View Inventory</a>
+            <a class="btn btn-primary" sec:authorize="hasAnyRole('ADMIN','INVENTORY_MANAGER')"
+               th:href="@{/stock/in}">Stock IN</a>
+        </div>
+    </div>
+
+    <!-- Counter cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-lg-2">
+            <div class="card stat-card h-100">
+                <div class="card-body">
+                    <div class="stat-label">Total Products</div>
+                    <div class="stat-value" th:text="${summary.totalProducts}">0</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-lg-2">
+            <div class="card stat-card h-100">
+                <div class="card-body">
+                    <div class="stat-label">Categories</div>
+                    <div class="stat-value" th:text="${summary.totalCategories}">0</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-lg-2">
+            <div class="card stat-card h-100">
+                <div class="card-body">
+                    <div class="stat-label">Plants</div>
+                    <div class="stat-value" th:text="${summary.totalPlants}">0</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-lg-2">
+            <div class="card stat-card h-100">
+                <div class="card-body">
+                    <div class="stat-label">Suppliers</div>
+                    <div class="stat-value" th:text="${summary.totalSuppliers}">0</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-lg-2">
+            <div class="card stat-card h-100">
+                <div class="card-body">
+                    <div class="stat-label">Current Stock</div>
+                    <div class="stat-value" th:text="${summary.currentStock}">0</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-lg-2">
+            <div class="card stat-card stat-warning h-100">
+                <div class="card-body">
+                    <div class="stat-label">Low Stock Items</div>
+                    <div class="stat-value" th:text="${summary.lowStockItems}">0</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <!-- Recent Stock IN -->
+        <div class="col-12 col-xl-6">
+            <div class="card h-100">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span>Recent Stock IN</span>
+                    <a class="small text-decoration-none"
+                       th:href="@{/transactions(type='IN')}">View all</a>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover mb-0">
+                        <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Plant</th>
+                            <th class="text-end">Qty</th>
+                            <th>Date</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="txn : ${summary.recentStockIn}">
+                            <td th:text="${txn.productCode + ' - ' + txn.productName}">product</td>
+                            <td th:text="${txn.plantName}">plant</td>
+                            <td class="text-end text-success fw-semibold"
+                                th:text="${txn.quantity}">0</td>
+                            <td th:text="${txn.transactionDate}">date</td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(summary.recentStockIn)}">
+                            <td colspan="4" class="empty-state">No stock IN movements yet.</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Stock OUT -->
+        <div class="col-12 col-xl-6">
+            <div class="card h-100">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span>Recent Stock OUT</span>
+                    <a class="small text-decoration-none"
+                       th:href="@{/transactions(type='OUT')}">View all</a>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover mb-0">
+                        <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Plant</th>
+                            <th class="text-end">Qty</th>
+                            <th>Date</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="txn : ${summary.recentStockOut}">
+                            <td th:text="${txn.productCode + ' - ' + txn.productName}">product</td>
+                            <td th:text="${txn.plantName}">plant</td>
+                            <td class="text-end text-danger fw-semibold"
+                                th:text="${txn.quantity}">0</td>
+                            <td th:text="${txn.transactionDate}">date</td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(summary.recentStockOut)}">
+                            <td colspan="4" class="empty-state">No stock OUT movements yet.</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Low stock -->
+        <div class="col-12 col-xl-7">
+            <div class="card h-100">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span>Low Stock (quantity at or below reorder level)</span>
+                    <a class="small text-decoration-none" th:href="@{/low-stock}">View all</a>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover mb-0">
+                        <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Plant</th>
+                            <th class="text-end">Qty</th>
+                            <th class="text-end">Reorder</th>
+                            <th>Status</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="row : ${summary.lowStockRows}">
+                            <td th:text="${row.productCode + ' - ' + row.productName}">product</td>
+                            <td th:text="${row.plantName}">plant</td>
+                            <td class="text-end" th:text="${row.quantity}">0</td>
+                            <td class="text-end" th:text="${row.reorderLevel}">0</td>
+                            <td th:replace="~{fragments/alerts :: stockBadge(${row.status})}"></td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(summary.lowStockRows)}">
+                            <td colspan="5" class="empty-state">Nothing is below its reorder level.</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Plant-wise summary -->
+        <div class="col-12 col-xl-5">
+            <div class="card h-100">
+                <div class="card-header">Plant-wise Stock</div>
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover mb-0">
+                        <thead>
+                        <tr>
+                            <th>Plant</th>
+                            <th class="text-end">Products</th>
+                            <th class="text-end">Total Qty</th>
+                            <th class="text-end">Low</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="plant : ${summary.plantStock}">
+                            <td th:text="${plant.plantName}">plant</td>
+                            <td class="text-end" th:text="${plant.productCount}">0</td>
+                            <td class="text-end" th:text="${plant.totalQuantity}">0</td>
+                            <td class="text-end">
+                                <span class="badge text-bg-danger"
+                                      th:text="${plant.lowStockCount}">0</span>
+                            </td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(summary.plantStock)}">
+                            <td colspan="4" class="empty-state">No plants configured.</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer th:replace="~{fragments/tail :: tail}"></footer>
+<th:block th:replace="~{fragments/tail :: scripts}"></th:block>
+</body>
+</html>

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head(${supplier.name})}">
+    <meta charset="UTF-8">
+    <title>Supplier view | Electrical Inventory</title>
+</head>
+<body>
+<nav th:replace="~{fragments/navbar :: navbar('suppliers')}"></nav>
+
+<main class="container py-4">
+    <div th:replace="~{fragments/alerts :: alerts}"></div>
+
+    <div class="page-header">
+        <div>
+            <h1 class="page-title" th:text="${supplier.name}">Supplier</h1>
+            <p class="page-subtitle">Supplier detail record (demonstration data).</p>
+        </div>
+        <div class="d-flex gap-2 no-print">
+            <a class="btn btn-outline-primary"
+               th:href="@{/suppliers/{id}/edit(id=${supplier.id})}">Edit</a>
+            <a class="btn btn-outline-secondary" th:href="@{/suppliers}">Back to list</a>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <table class="table table-sm mb-0">
+                <tbody>
+                <tr>
+                    <th scope="row" style="width: 30%">Supplier Code</th>
+                    <td class="fw-semibold" th:text="${supplier.supplierCode}">CODE</td>
+                </tr>
+                <tr>
+                    <th scope="row">Name</th>
+                    <td th:text="${supplier.name}">Name</td>
+                </tr>
+                <tr>
+                    <th scope="row">Contact Person</th>
+                    <td th:text="${supplier.contactPerson} ?: '-'">-</td>
+                </tr>
+                <tr>
+                    <th scope="row">Email</th>
+                    <td th:text="${supplier.email} ?: '-'">-</td>
+                </tr>
+                <tr>
+                    <th scope="row">Phone</th>
+                    <td th:text="${supplier.phone} ?: '-'">-</td>
+                </tr>
+                <tr>
+                    <th scope="row">Address</th>
+                    <td th:text="${supplier.address} ?: '-'">-</td>
+                </tr>
+                <tr>
+                    <th scope="row">Status</th>
+                    <td th:replace="~{fragments/alerts :: activeBadge(${supplier.active})}"></td>
+                </tr>
+                <tr>
+                    <th scope="row">Created</th>
+                    <td th:text="${supplier.createdAt}">-</td>
+                </tr>
+                <tr>
+                    <th scope="row">Last Updated</th>
+                    <td th:text="${supplier.updatedAt}">-</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
+
+<footer th:replace="~{fragments/tail :: tail}"></footer>
+<th:block th:replace="~{fragments/tail :: scripts}"></th:block>
+</body>
+</html>

@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/head :: head(${formTitle})}">
+    <meta charset="UTF-8">
+    <title>Stock movement | Electrical Inventory</title>
+</head>
+<body>
+<nav th:replace="~{fragments/navbar :: navbar(${isStockIn} ? 'stock-in' : 'stock-out')}"></nav>
+
+<main class="container py-4">
+    <div th:replace="~{fragments/alerts :: alerts}"></div>
+
+    <div class="page-header">
+        <div>
+            <h1 class="page-title" th:text="${formTitle}">Stock Movement</h1>
+            <p class="page-subtitle" th:if="${isStockIn}">
+                Receiving stock increases the quantity of the selected product at the selected
+                plant and writes a transaction record.
+            </p>
+            <p class="page-subtitle" th:unless="${isStockIn}">
+                Issuing stock decreases the quantity. The operation is rejected if it would take
+                the quantity below zero.
+            </p>
+        </div>
+        <a class="btn btn-outline-secondary" th:href="@{/inventory}">View Inventory</a>
+    </div>
+
+    <div class="alert alert-success no-print" th:if="${param.success}" th:text="${param.success}">
+        Stock movement saved.
+    </div>
+
+    <div class="row g-3">
+        <div class="col-12 col-lg-7">
+            <div class="card">
+                <div class="card-header"
+                     th:classappend="${isStockIn} ? 'bg-success-subtle' : 'bg-danger-subtle'"
+                     th:text="${isStockIn} ? 'Stock IN details' : 'Stock OUT details'">
+                    Movement details
+                </div>
+                <div class="card-body">
+                    <form method="post" th:action="${formAction}" th:object="${stockForm}" novalidate>
+                        <div class="row g-3">
+
+                            <div class="col-12">
+                                <label class="form-label" for="productId">
+                                    Product <span class="required-mark">*</span>
+                                </label>
+                                <select id="productId" th:field="*{productId}" class="form-select"
+                                        th:classappend="${#fields.hasErrors('productId')} ? 'is-invalid'">
+                                    <option value="">-- Select product --</option>
+                                    <option th:each="product : ${products}" th:value="${product.id}"
+                                            th:text="${product.productCode + ' - ' + product.name}">
+                                        Product
+                                    </option>
+                                </select>
+                                <div class="invalid-feedback"
+                                     th:if="${#fields.hasErrors('productId')}"
+                                     th:errors="*{productId}">error</div>
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label" for="plantId">
+                                    Plant <span class="required-mark">*</span>
+                                </label>
+                                <select id="plantId" th:field="*{plantId}" class="form-select"
+                                        th:classappend="${#fields.hasErrors('plantId')} ? 'is-invalid'">
+                                    <option value="">-- Select plant --</option>
+                                    <option th:each="plant : ${plants}" th:value="${plant.id}"
+                                            th:text="${plant.name}">Plant</option>
+                                </select>
+                                <div class="invalid-feedback"
+                                     th:if="${#fields.hasErrors('plantId')}"
+                                     th:errors="*{plantId}">error</div>
+                            </div>
+
+                            <div class="col-12 col-md-6">
+                                <label class="form-label" for="quantity">
+                                    Quantity <span class="required-mark">*</span>
+                                </label>
+                                <input type="number" id="quantity" th:field="*{quantity}" min="1"
+                                       class="form-control"
+                                       th:classappend="${#fields.hasErrors('quantity')} ? 'is-invalid'">
+                                <div class="form-text">Must be greater than zero.</div>
+                                <div class="invalid-feedback"
+                                     th:if="${#fields.hasErrors('quantity')}"
+                                     th:errors="*{quantity}">error</div>
+                            </div>
+
+                            <div class="col-12 col-md-6">
+                                <label class="form-label" for="referenceNumber">Reference Number</label>
+                                <input type="text" id="referenceNumber" th:field="*{referenceNumber}"
+                                       class="form-control" placeholder="e.g. GRN-2026-0001"
+                                       th:classappend="${#fields.hasErrors('referenceNumber')} ? 'is-invalid'">
+                                <div class="invalid-feedback"
+                                     th:if="${#fields.hasErrors('referenceNumber')}"
+                                     th:errors="*{referenceNumber}">error</div>
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label" for="remarks">Remarks</label>
+                                <textarea id="remarks" th:field="*{remarks}" rows="3"
+                                          class="form-control"
+                                          th:classappend="${#fields.hasErrors('remarks')} ? 'is-invalid'"></textarea>
+                                <div class="invalid-feedback"
+                                     th:if="${#fields.hasErrors('remarks')}"
+                                     th:errors="*{remarks}">error</div>
+                            </div>
+
+                        </div>
+
+                        <div class="d-flex gap-2 mt-4">
+                            <button type="submit" class="btn btn-primary"
+                                    th:classappend="${isStockIn} ? 'btn-success' : 'btn-danger'"
+                                    th:data-confirm="${isStockIn} ? null : 'Issue this stock?'"
+                                    th:text="${isStockIn} ? 'Confirm Stock IN' : 'Confirm Stock OUT'">
+                                Submit
+                            </button>
+                            <a class="btn btn-outline-secondary" th:href="@{/inventory}">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-lg-5">
+            <div class="card">
+                <div class="card-header">How this works</div>
+                <div class="card-body small text-muted">
+                    <ol class="mb-3 ps-3">
+                        <li>The request is validated (product, plant, positive quantity).</li>
+                        <li th:if="${isStockIn}">
+                            The inventory row for this product and plant is found or created.
+                        </li>
+                        <li th:unless="${isStockIn}">
+                            The available quantity is checked first.
+                        </li>
+                        <li>The quantity is updated inside a single database transaction.</li>
+                        <li>A transaction record is written with your email as the performer.</li>
+                    </ol>
+                    <p class="mb-0" th:unless="${isStockIn}">
+                        <strong>Stock OUT is rejected</strong> when the requested quantity is more
+                        than what is available. Nothing is changed in that case.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer th:replace="~{fragments/tail :: tail}"></footer>
+<th:block th:replace="~{fragments/tail :: scripts}"></th:block>
+</body>
+</html>

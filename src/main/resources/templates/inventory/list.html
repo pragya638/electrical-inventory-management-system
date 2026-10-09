@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/head :: head('Inventory')}">
+    <meta charset="UTF-8">
+    <title>Inventory | Electrical Inventory</title>
+</head>
+<body>
+<nav th:replace="~{fragments/navbar :: navbar('inventory')}"></nav>
+
+<main class="container-fluid py-4 px-lg-4">
+    <div th:replace="~{fragments/alerts :: alerts}"></div>
+
+    <div class="page-header no-print">
+        <div>
+            <h1 class="page-title">Inventory</h1>
+            <p class="page-subtitle">
+                Current quantity of every product at every plant. Quantity changes only through
+                Stock IN and Stock OUT.
+            </p>
+        </div>
+        <div class="d-flex gap-2">
+            <a class="btn btn-outline-secondary no-print"
+               th:href="@{/reports/export/inventory.csv}">Export CSV</a>
+            <a class="btn btn-primary" sec:authorize="hasAnyRole('ADMIN','INVENTORY_MANAGER')"
+               th:href="@{/stock/in}">Stock IN</a>
+        </div>
+    </div>
+
+    <form class="filter-bar mb-3 no-print" method="get" th:action="@{/inventory}">
+        <div class="row g-2 align-items-end">
+            <div class="col-12 col-md-4">
+                <label class="form-label" for="productId">Product</label>
+                <select id="productId" name="productId" class="form-select">
+                    <option value="">All products</option>
+                    <option th:each="product : ${products}" th:value="${product.id}"
+                            th:text="${product.productCode + ' - ' + product.name}"
+                            th:selected="${filter.productId != null
+                                          and filter.productId == product.id}">Product</option>
+                </select>
+            </div>
+            <div class="col-12 col-md-3">
+                <label class="form-label" for="plantId">Plant</label>
+                <select id="plantId" name="plantId" class="form-select">
+                    <option value="">All plants</option>
+                    <option th:each="plant : ${plants}" th:value="${plant.id}"
+                            th:text="${plant.name}"
+                            th:selected="${filter.plantId != null
+                                          and filter.plantId == plant.id}">Plant</option>
+                </select>
+            </div>
+            <div class="col-6 col-md-3">
+                <label class="form-label" for="status">Stock Status</label>
+                <select id="status" name="status" class="form-select">
+                    <option value="">All statuses</option>
+                    <option th:each="option : ${T(com.wonder.electricals.inventory.dto.StockStatus).values()}"
+                            th:value="${option.name()}"
+                            th:text="${option.name().replace('_',' ')}"
+                            th:selected="${filter.status != null
+                                          and filter.status.name() == option.name()}">Status</option>
+                </select>
+            </div>
+            <div class="col-6 col-md-2 d-flex gap-2">
+                <button type="submit" class="btn btn-primary">Apply</button>
+                <a class="btn btn-outline-secondary" th:href="@{/inventory}">Reset</a>
+            </div>
+        </div>
+    </form>
+
+    <div class="card">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                <tr>
+                    <th>Product Code</th>
+                    <th>Product</th>
+                    <th>Plant</th>
+                    <th class="text-end">Current Quantity</th>
+                    <th>Unit</th>
+                    <th class="text-end">Reorder Level</th>
+                    <th>Stock Status</th>
+                    <th>Last Updated</th>
+                    <th class="text-end no-print">Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="row : ${rows}">
+                    <td class="fw-semibold" th:text="${row.productCode}">CODE</td>
+                    <td th:text="${row.productName}">Product</td>
+                    <td th:text="${row.plantName}">Plant</td>
+                    <td class="text-end fw-semibold" th:text="${row.quantity}">0</td>
+                    <td th:text="${row.unit}">Unit</td>
+                    <td class="text-end" th:text="${row.reorderLevel}">0</td>
+                    <td th:replace="~{fragments/alerts :: stockBadge(${row.status})}"></td>
+                    <td class="text-muted small" th:text="${row.lastUpdated}">-</td>
+                    <td class="text-end no-print">
+                        <div class="btn-group btn-group-sm">
+                            <a class="btn btn-outline-success"
+                               sec:authorize="hasAnyRole('ADMIN','INVENTORY_MANAGER')"
+                               th:href="@{/stock/in}">IN</a>
+                            <a class="btn btn-outline-danger"
+                               sec:authorize="hasAnyRole('ADMIN','INVENTORY_MANAGER')"
+                               th:href="@{/stock/out(productId=${row.productId},plantId=${row.plantId})}">OUT</a>
+                        </div>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(rows)}">
+                    <td colspan="9" class="empty-state">
+                        No inventory records match the current filter.
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
+
+<footer th:replace="~{fragments/tail :: tail}"></footer>
+<th:block th:replace="~{fragments/tail :: scripts}"></th:block>
+</body>
+</html>

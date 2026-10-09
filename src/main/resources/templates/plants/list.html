@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/head :: head('Plants')}">
+    <meta charset="UTF-8">
+    <title>Plants | Electrical Inventory</title>
+</head>
+<body>
+<nav th:replace="~{fragments/navbar :: navbar('plants')}"></nav>
+
+<main class="container-fluid py-4 px-lg-4">
+    <div th:replace="~{fragments/alerts :: alerts}"></div>
+
+    <div class="page-header no-print">
+        <div>
+            <h1 class="page-title">Plants</h1>
+            <p class="page-subtitle">
+                Stocking locations. The plants listed in the demo data are demonstration records.
+            </p>
+        </div>
+        <a class="btn btn-primary" sec:authorize="hasAnyRole('ADMIN','INVENTORY_MANAGER')"
+           th:href="@{/plants/new}">Add Plant</a>
+    </div>
+
+    <div class="card">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                <tr>
+                    <th style="width: 60px">ID</th>
+                    <th>Name</th>
+                    <th>Location</th>
+                    <th>Contact Person</th>
+                    <th>Contact Number</th>
+                    <th>Status</th>
+                    <th class="text-end no-print">Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="plant : ${plants}">
+                    <td class="text-muted" th:text="${plant.id}">0</td>
+                    <td class="fw-semibold">
+                        <a th:href="@{/plants/{id}(id=${plant.id})}" class="text-decoration-none"
+                           th:text="${plant.name}">Name</a>
+                    </td>
+                    <td th:text="${plant.location} ?: '-'">-</td>
+                    <td th:text="${plant.contactPerson} ?: '-'">-</td>
+                    <td th:text="${plant.contactNumber} ?: '-'">-</td>
+                    <td th:replace="~{fragments/alerts :: activeBadge(${plant.active})}"></td>
+                    <td class="text-end no-print">
+                        <div class="btn-group btn-group-sm">
+                            <a class="btn btn-outline-secondary"
+                               th:href="@{/plants/{id}(id=${plant.id})}">View</a>
+                            <a class="btn btn-outline-primary"
+                               sec:authorize="hasAnyRole('ADMIN','INVENTORY_MANAGER')"
+                               th:href="@{/plants/{id}/edit(id=${plant.id})}">Edit</a>
+                            <form th:action="@{/plants/{id}/status(id=${plant.id})}"
+                                  method="post" class="d-inline">
+                                <input type="hidden" name="active" th:value="${!plant.active}">
+                                <button type="submit" class="btn btn-outline-warning"
+                                        th:data-confirm="${plant.active}
+                                            ? 'Deactivate this plant?' : 'Activate this plant?'"
+                                        th:text="${plant.active} ? 'Deactivate' : 'Activate'">
+                                    Toggle
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(plants)}">
+                    <td colspan="7" class="empty-state">No plants found.</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
+
+<footer th:replace="~{fragments/tail :: tail}"></footer>
+<th:block th:replace="~{fragments/tail :: scripts}"></th:block>
+</body>
+</html>
