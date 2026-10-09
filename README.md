@@ -12,7 +12,35 @@ role-based access control and a REST API, built with Spring Boot and Thymeleaf.
 
 ---
 
+## Live Demo
+
+The application is live and can be tried at:
+
+**<https://electrical-inventory-management-system.onrender.com>**
+
+It is deployed on **Render** using a **Docker** image and uses a **MySQL** database
+hosted on **Aiven**. Sign in with one of the accounts listed in the
+[Demo credentials](#demo-credentials) section.
+
+| | |
+| --- | --- |
+| **Project type** | Internship prototype / demonstration project |
+| **Backend** | Java 17, Spring Boot |
+| **Frontend** | Thymeleaf, HTML, CSS, Bootstrap, JavaScript |
+| **Database** | MySQL |
+| **Authentication** | Session-based login with BCrypt-hashed passwords and role-based access |
+| **Main modules** | Dashboard, Products, Categories, Plants, Suppliers, Inventory, Stock IN, Stock OUT, Transactions, Low Stock, Reports, Users |
+| **Roles** | ADMIN, INVENTORY_MANAGER, VIEWER |
+
+> **Important:** The live application runs on **demonstration data only**. It is a
+> prototype, **not** a production system, and does not represent an operating business
+> of **Wonder Electricals Limited**. Do not use it to manage real business data.
+
+---
+
 ## Table of contents
+
+- [Live Demo](#live-demo)
 
 - [Project description](#project-description)
 - [Main features](#main-features)
