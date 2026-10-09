@@ -1,0 +1,37 @@
+# Local build output - never copy the developer's target/ into the image
+target/
+
+# Version control and IDE metadata
+.git/
+.gitignore
+.idea/
+*.iml
+*.iws
+.ipr
+
+# Local runtime logs
+*.log
+*.err
+*.pid
+logs/
+
+# Secrets and local overrides - never copy these into a container image
+.env
+.env.*
+application-local.properties
+*-local.properties
+*-secret.properties
+*.pem
+*.key
+
+# Documentation is not needed in the runtime image
+README.md
+docs/
+
+# OS noise
+.DS_Store
+Thumbs.db
+
+# Docker metadata itself
+.dockerignore
+Dockerfile
